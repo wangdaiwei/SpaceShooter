@@ -4,6 +4,7 @@ using System.Collections;
 public class GameController : MonoBehaviour
 {
 	public GameObject hazard;
+	public GameObject enemy;
 	public Vector3 spawnValues;
 	public int hazardCount;
 	public float spawnWait;
@@ -17,6 +18,7 @@ public class GameController : MonoBehaviour
 	private bool gameOver;
 	private bool restart;
 	private int score;
+	private int level;
 	
 	void Start ()
 	{
@@ -49,6 +51,12 @@ public class GameController : MonoBehaviour
 			{
 				Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
 				Quaternion spawnRotation = Quaternion.identity;
+				if (i % 3 == 0) {
+					spawnRotation = new Quaternion(0.0f, 180.0f, 0.0f, 1.0f);
+					Instantiate (enemy, spawnPosition, spawnRotation);
+					yield return new WaitForSeconds (spawnWait);
+					continue;
+				}
 				Instantiate (hazard, spawnPosition, spawnRotation);
 				yield return new WaitForSeconds (spawnWait);
 			}
@@ -60,6 +68,10 @@ public class GameController : MonoBehaviour
 				restart = true;
 				break;
 			}
+
+			// increase the game difficulty after every wave
+			hazardCount += 5;
+			spawnWait -= 0.01f;
 		}
 	}
 
@@ -76,7 +88,7 @@ public class GameController : MonoBehaviour
 
 	public void GameOver ()
 	{
-		gameOverText.text = "Game Over!";
+		gameOverText.text = "Game Over!\nYou Reach Level " + level;
 		gameOver = true;
 	}
 }
